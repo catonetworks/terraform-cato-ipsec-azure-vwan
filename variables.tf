@@ -60,8 +60,8 @@ variable "site_location" {
   })
 }
 
-variable "primary_public_cato_ip_id" {
-  description = "Primary tunnel POP location ID"
+variable "cato_primary_public_ip" {
+  description = "Cato primary public IP"
   type        = number
 }
 

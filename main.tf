@@ -11,7 +11,7 @@ provider "cato" {
 }
 
 data "cato_entitylookup" "allocatedIps" {
-  entity_ids = [var.primary_public_cato_ip_id]
+  names = [var.cato_primary_public_ip]
   type = "allocatedIP"
 }
 
@@ -20,9 +20,17 @@ locals {
   hub_name                = regex("virtualHubs/(.*)", var.azure_vwan_hub_id)[0]
   allocated_ip_map = {
     for item in data.cato_entitylookup.allocatedIps.items :
-    item.id => item.name  # Mapping id to name (IP)
+    item.name => item.id  # Mapping name to ID
   }
-  cato_primary_ip = lookup(local.allocated_ip_map, tostring(var.primary_public_cato_ip_id), null)
+  is_cato_primary_ip_exist = lookup(local.allocated_ip_map, tostring(var.cato_primary_public_ip), null)
+}
+
+resource "null_resource" "check_primary_ip" {
+  provisioner "local-exec" {
+    command = "exit 1"
+    when    = local.is_cato_primary_ip_exist == null ? true : false
+  }
+  depends_on = [local.is_cato_primary_ip_exist]
 }
 
 data "azurerm_virtual_hub" "hub" {
@@ -50,7 +58,7 @@ resource "azurerm_vpn_site" "cato_vpn_site" {
   virtual_wan_id      = data.azurerm_virtual_hub.hub.virtual_wan_id
   link {
     name       = var.vpn_site_primary_link_name
-    ip_address = local.cato_primary_ip
+    ip_address = var.cato_primary_public_ip
     speed_in_mbps = var.connection_bandwidth
     bgp {
       asn = var.cato_asn
@@ -96,7 +104,7 @@ resource "cato_ipsec_site" "vwan-hub" {
   site_location        = var.site_location
   ipsec = {
     primary = {
-      public_cato_ip_id = var.primary_public_cato_ip_id
+      public_cato_ip_id = var.cato_primary_public_ip
       tunnels = [
         {
           public_site_ip = replace(data.local_file.azure_primary_public_ip.content, "\n", "")
