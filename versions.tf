@@ -6,7 +6,7 @@ terraform {
     }
     cato = {
       source  = "registry.terraform.io/terraform-providers/cato"
-      version = "0.0.13"
+      version = "0.0.12"
     }
   }
 }

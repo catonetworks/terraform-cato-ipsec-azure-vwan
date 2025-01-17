@@ -4,11 +4,6 @@ variable "cato_baseurl" {
   default     = "https://api.catonetworks.com/api/v1/graphql2"
 }
 
-variable "azure_subscription_id" {
-  description = "Azure subscription"
-  type = string
-}
-
 variable "azure_vwan_hub_id" {
   description = "Azure vWAN Hub ID"
   type = string
@@ -45,6 +40,11 @@ variable "vpn_site_primary_link_name" {
   default     = "primary"
 }
 
+variable "vpn_site_secondary_link_name" {
+  type        = string
+  default     = "secondary"
+}
+
 variable "site_description" {
   description = "Description of the IPSec site"
   type        = string
@@ -62,7 +62,12 @@ variable "site_location" {
 
 variable "cato_primary_public_ip" {
   description = "Cato primary public IP"
-  type        = number
+  type        = string
+}
+
+variable "cato_secondary_public_ip" {
+  description = "Cato secondary public IP"
+  type        = string
 }
 
 variable "bgp_enabled" {
@@ -75,7 +80,12 @@ variable "cato_asn" {
   type = number
 }
 
-variable "cato_peering_address" {
+variable "cato_primary_peering_address" {
+  description = "Cato BGP peering IP address"
+  type = string
+}
+
+variable "cato_secondary_peering_address" {
   description = "Cato BGP peering IP address"
   type = string
 }
