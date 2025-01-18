@@ -1,5 +1,6 @@
 provider "azurerm" {
   features {}
+  subscription_id = var.azure_subscription_id
 }
 
 provider "cato" {
@@ -8,16 +9,15 @@ provider "cato" {
   account_id = var.cato_account_id
 }
 
-data "cato_entitylookup" "allocatedIps" {
-  names = [var.cato_primary_public_ip, var.cato_secondary_public_ip]
-  type = "allocatedIP"
+data "cato_allocatedIp" "allocatedIps" {
+  name_filter = [var.cato_primary_public_ip, var.cato_secondary_public_ip]
 }
 
 locals {
   resource_group_name = regex("resourceGroups/(.*?)/providers", var.azure_vwan_hub_id)[0]
   hub_name                = regex("virtualHubs/(.*)", var.azure_vwan_hub_id)[0]
   allocated_ip_map = {
-    for item in data.cato_entitylookup.allocatedIps.items :
+    for item in data.cato_allocatedIp.allocatedIps.items :
     item.name => item.id  # Mapping name to ID
   }
   cato_primary_ip_id = lookup(local.allocated_ip_map, var.cato_primary_public_ip, null)

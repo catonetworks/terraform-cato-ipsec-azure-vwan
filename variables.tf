@@ -4,6 +4,11 @@ variable "cato_baseurl" {
   default     = "https://api.catonetworks.com/api/v1/graphql2"
 }
 
+variable "azure_subscription_id" {
+  description = "Azure subscription"
+  type = string
+}
+
 variable "azure_vwan_hub_id" {
   description = "Azure vWAN Hub ID"
   type = string
